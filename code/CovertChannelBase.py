@@ -14,6 +14,7 @@ class CovertChannelBase:
         """
         pass
     def send(self, packet, interface="eth0"):
+        print("Sending", packet)
         """
         - You must send each packet by using this function.
         - Call this function with the packet and sender's interface (Default interface is "eth0" and you do not have to set unless there is a specific purpose.)
@@ -57,7 +58,7 @@ class CovertChannelBase:
         random_message = self.generate_random_message(min_length=min_length, max_length=max_length)
         random_binary_message = self.convert_string_message_to_binary(message=random_message)
         return random_binary_message
-    def generate_random_binary_message_with_logging(self, log_file_name, min_length=50, max_length=100):
+    def generate_random_binary_message_with_logging(self, log_file_name, min_length=16, max_length=16):
         """
         - Same as generate_random_binary_message() function with logging option.
         """

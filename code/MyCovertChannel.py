@@ -1,25 +1,70 @@
+from scapy.all import ARP, Ether, sendp, sniff
 from CovertChannelBase import CovertChannelBase
+import time
 
 class MyCovertChannel(CovertChannelBase):
-    """
-    - You are not allowed to change the file name and class name.
-    - You can edit the class in any way you want (e.g. adding helper functions); however, there must be a "send" and a "receive" function, the covert channel will be triggered by calling these functions.
-    """
     def __init__(self):
-        """
-        - You can edit __init__.
-        """
-        pass
+        super().__init__()
+
     def send(self, log_file_name, parameter1, parameter2):
         """
-        - In this function, you expected to create a random message (using function/s in CovertChannelBase), and send it to the receiver container. Entire sending operations should be handled in this function.
-        - After the implementation, please rewrite this comment part to explain your code basically.
+        Sends binary-encoded ARP packets.
+        Each bit is encoded as a specific destination IP address in an ARP request.
         """
         binary_message = self.generate_random_binary_message_with_logging(log_file_name)
-        
+
+        # Start the timer
+        start_time = time.time()
+        for bit in binary_message:
+            # Set target IP based on the bit ('1' or '0')
+            target_ip = parameter1 if bit == '1' else parameter2
+
+            # Construct the ARP packet
+            packet = Ether() / ARP(
+                pdst=target_ip     # Destination IP encoding the bit
+            )
+
+            sendp(packet, verbose=False)
+        # End the timer
+        end_time = time.time()
+        # Calculate the time taken in seconds
+        # print("Elapsed time: ", end_time - start_time)
+        # print("Capacity: ", (end_time - start_time) / len(binary_message))
+
     def receive(self, parameter1, parameter2, parameter3, log_file_name):
         """
-        - In this function, you are expected to receive and decode the transferred message. Because there are many types of covert channels, the receiver implementation depends on the chosen covert channel type, and you may not need to use the functions in CovertChannelBase.
-        - After the implementation, please rewrite this comment part to explain your code basically.
+        Listens for ARP packets and decodes the binary message from their destination IP field.
+        Stops capturing when the dot character ('.') is received.
         """
-        self.log_message("", log_file_name)
+        binary_message = ""
+        message = ""
+        stop_sniffing = False
+
+        def process_packet(packet):
+            nonlocal binary_message, stop_sniffing, message
+
+            if packet.haslayer(ARP):
+                # Decode the bit based on the destination IP address
+                if packet.pdst == parameter1:
+                    binary_message += '1'
+                elif packet.pdst == parameter2:
+                    binary_message += '0'
+
+                # Check if a complete byte has been received
+                if len(binary_message) % 8 == 0:
+                    byte = binary_message[-8:]
+                    char = self.convert_eight_bits_to_character(byte)
+                    message += char
+
+                    # Check for the stopping character
+                    if char == '.':
+                        stop_sniffing = True
+
+        # Start sniffing ARP packets
+        sniff(filter="arp", prn=process_packet, stop_filter=lambda p: stop_sniffing)
+
+        self.log_message(message, log_file_name)
+
+
+
+

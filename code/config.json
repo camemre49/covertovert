@@ -1,17 +1,17 @@
 {
-  "covert_channel_code": "Replace it with the [Code] of chosen covert channel type seen in ODTUClass.",
+  "covert_channel_code": "CSC-PSV-ARP-DIA",
   "send": {
     "parameters": {
-      "parameter1": "p1",
-      "parameter2": 1234,
+      "parameter1": "192.168.1.1",
+      "parameter2": "192.168.1.2",
       "log_file_name": "Example_UDPTimingInterarrivalChannelSender.log"
     }
   },
   "receive": {
     "parameters": {
-      "parameter1": "p1",
-      "parameter2": 1234,
-      "parameter3": "p3",
+      "parameter1": "192.168.1.1",
+      "parameter2": "192.168.1.2",
+      "parameter3": "None",
       "log_file_name": "Example_UDPTimingInterarrivalChannelReceiver.log"
     }
   }
