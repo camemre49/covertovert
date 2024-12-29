@@ -29,7 +29,8 @@ class MyCovertChannel(CovertChannelBase):
         end_time = time.time()
         # Calculate the time taken in seconds
         # print("Elapsed time: ", end_time - start_time)
-        # print("Capacity: ", (end_time - start_time) / len(binary_message))
+        # Calculate the capacity in bits per second
+        # print("Capacity: ", len(binary_message) / (end_time - start_time))
 
     def receive(self, parameter1, parameter2, parameter3, log_file_name):
         """
